@@ -138,12 +138,30 @@ numbers.
 
 ## Deploying the backend (Render)
 
-- Root directory: `backend`
+A `render.yaml` blueprint is committed at the repo root. In Render choose **New > Blueprint**, pick this
+repo and Apply — it sets up the build/start commands and health check, and prompts for the secret values
+(`sync: false` keeps them out of git).
+
+Equivalent manual settings, if you prefer creating the service by hand:
+
+- Root directory: **repository root** — this is an npm workspace monorepo, so the build runs at the root
 - Build command: `npm install`
-- Start command: `npm start`
+- Start command: `npm start` (delegates to the `backend` workspace)
 - Health check path: `/api/health`
-- Set `MONGODB_URI`, `JWT_SECRET`, `NODE_ENV=production` and `CORS_ORIGINS` (your Vercel URL) in the
-  Render dashboard. Atlas should allow `0.0.0.0/0` for this demo.
+
+`backend/.env` is gitignored and is **not** deployed — Render injects the variables below directly into
+the process environment, and the server reads `PORT` from Render.
+
+| Variable | Value |
+|---|---|
+| `MONGODB_URI` | your Atlas connection string |
+| `JWT_SECRET` | the same long random string as local |
+| `NODE_ENV` | `production` |
+| `CORS_ORIGINS` | your Vercel URL (comma-separated; add localhost during development) |
+| `ADMIN_EMAIL` / `ADMIN_PASSWORD` | private admin credentials |
+| `DEMO_ADMIN_EMAIL` / `DEMO_ADMIN_PASSWORD` | demo admin credentials |
+
+In Atlas, add `0.0.0.0/0` to Network Access so Render can reach the cluster.
 
 Render free instances sleep when idle; the frontend shows a "waking up the server…" message on the
 first request.

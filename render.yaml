@@ -1,0 +1,44 @@
+# Render Blueprint for the NEXORA API.
+#
+# In Render: New > Blueprint > pick this repo > Apply.
+# Secrets are marked `sync: false`, so Render prompts for them at deploy time
+# instead of storing them in this file.
+
+services:
+  - type: web
+    name: nexora-api
+    runtime: node
+    plan: free
+    region: singapore
+    branch: main
+    autoDeploy: true
+    buildCommand: npm install
+    startCommand: npm start
+    healthCheckPath: /api/health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: JWT_EXPIRES_IN
+        value: 1d
+      - key: LOW_STOCK_THRESHOLD
+        value: 5
+      - key: ADMIN_NAME
+        value: NEXORA Admin
+      - key: DEMO_ADMIN_NAME
+        value: Demo Admin
+
+      # --- prompted on first deploy (never committed) ---
+      - key: MONGODB_URI
+        sync: false
+      - key: JWT_SECRET
+        sync: false
+      - key: CORS_ORIGINS
+        sync: false
+      - key: ADMIN_EMAIL
+        sync: false
+      - key: ADMIN_PASSWORD
+        sync: false
+      - key: DEMO_ADMIN_EMAIL
+        sync: false
+      - key: DEMO_ADMIN_PASSWORD
+        sync: false
