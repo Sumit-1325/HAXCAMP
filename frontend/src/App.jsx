@@ -5,6 +5,7 @@ import { CartProvider } from './context/CartContext.jsx';
 import { ToastProvider } from './context/ToastContext.jsx';
 import Landing from './pages/store/Landing.jsx';
 import NotFound from './pages/store/NotFound.jsx';
+import ProductListing from './pages/store/ProductListing.jsx';
 
 export default function App() {
   return (
@@ -14,6 +15,7 @@ export default function App() {
           <Routes>
             <Route element={<StoreLayout />}>
               <Route path="/" element={<Landing />} />
+              <Route path="/products" element={<ProductListing />} />
               <Route path="*" element={<NotFound />} />
             </Route>
           </Routes>
