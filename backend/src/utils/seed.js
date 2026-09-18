@@ -5,6 +5,7 @@ import { resetOrderCounter } from '../models/Counter.js';
 import { Order } from '../models/Order.js';
 import { Product } from '../models/Product.js';
 import { SEED_PRODUCTS } from './seedData.js';
+import { buildHistoricalOrders } from './seedOrders.js';
 
 const resetDatabase = async () => {
   await Promise.all([
@@ -25,6 +26,16 @@ const seedAdmins = async () => {
   return admins;
 };
 
+const seedOrders = async (products) => {
+  const orders = await buildHistoricalOrders(products);
+
+  // timestamps: false keeps the explicit createdAt we generated, so the
+  // analytics range genuinely spans the last six months.
+  await Order.insertMany(orders, { timestamps: false });
+
+  return orders.length;
+};
+
 const run = async () => {
   await connectDB();
   console.log('[seed] clearing existing data...');
@@ -35,6 +46,9 @@ const run = async () => {
 
   const admins = await seedAdmins();
   admins.forEach((admin) => console.log(`[seed] admin ready: ${admin.email} (${admin.role})`));
+
+  const orderCount = await seedOrders(products);
+  console.log(`[seed] inserted ${orderCount} historical orders over the last 6 months`);
 
   await disconnectDB();
   console.log('[seed] done');
