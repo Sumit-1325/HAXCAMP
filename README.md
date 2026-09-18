@@ -22,9 +22,47 @@ Express + MongoDB backend.
   details, cart, checkout, confirmation.
 - **Day 3 (admin + analytics):** complete — 85 seeded historical orders, aggregation endpoint, admin
   login + protected routes, Recharts dashboard, product CRUD, order status workflow.
-- **Deploy (Vercel + Render) and Day 4 polish:** pending.
+- **Day 4 (polish):** complete — recommendations, recently viewed, responsive pass, states audit,
+  screenshots. Feature freeze.
+- **Deploy (Vercel + Render):** pending.
 
-## Repository layout
+## Architecture
+
+```
+        ┌──────────────────────── one Vite app ────────────────────────┐
+        │                                                              │
+        │   Storefront (eager)                 Admin (lazy chunk)      │
+        │   /  /products  /products/:id        /admin/*                │
+        │   /cart  /checkout  /confirmation    dashboard / products     │
+        │                                      orders                  │
+        └───────────────────────────┬──────────────────────────────────┘
+                                    │  one Axios instance
+                                    │  VITE_API_URL · bearer token · 401 clears session
+                                    ▼
+        ┌───────────────────── Express REST API ───────────────────────┐
+        │  routes → controllers → models   │  middleware:             │
+        │  products · orders · auth        │   errorMiddleware        │
+        │  admin/analytics                 │   authMiddleware (JWT)   │
+        └───────────────────────────┬──────────────────────────────────┘
+                                    │  Mongoose
+                                    ▼
+                          MongoDB Atlas (nexora)
+
+  Pricing, stock decrement, order numbers and every dashboard figure are
+  computed server-side. The browser never sends a price or a total.
+```
+
+## Screenshots
+
+| | |
+|---|---|
+| **Landing** — hero, honest value props, newest products<br>![Landing](docs/screenshots/01-landing.png) | **Listing** — search, category filter, sort, pagination<br>![Listing](docs/screenshots/02-listing.png) |
+| **Product details** — stock-capped quantity, recommendations<br>![Product details](docs/screenshots/03-details.png) | **Cart** — persisted locally, priced by the server<br>![Cart](docs/screenshots/04-cart.png) |
+| **Checkout** — validated, no account required<br>![Checkout](docs/screenshots/05-checkout.png) | **Dashboard** — every figure from a real aggregation<br>![Admin dashboard](docs/screenshots/06-admin-dashboard.png) |
+| **Orders** — inline status workflow<br>![Admin orders](docs/screenshots/07-admin-orders.png) | **Products** — create, edit, soft delete<br>![Admin products](docs/screenshots/08-admin-products.png) |
+
+## Stack
+
 
 ```
 HAXCAMP/
@@ -140,6 +178,7 @@ All responses are `{ "success": true, "data": ... }` or `{ "success": false, "me
 | GET | `/api/health` | — | Liveness probe (frontend pings this on load) |
 | GET | `/api/products` | — | List products. Query: `search`, `category`, `sort`, `page`, `limit` |
 | GET | `/api/products/:id` | — | Single product |
+| GET | `/api/products/:id/recommendations` | — | Up to 4 same-category products, closest price first |
 | POST | `/api/products` | Admin | Create product |
 | PUT | `/api/products/:id` | Admin | Update product |
 | DELETE | `/api/products/:id` | Admin | **Soft delete** (`isActive: false`) |
@@ -199,6 +238,32 @@ Months are bucketed in UTC and labelled from a fixed table, and months with no o
 zero so the chart stays continuous. The by-month series always reconciles with `totalRevenue` and
 `totalOrders` — the seeder generates its history inside the same window that the endpoint charts, so the
 two can't drift apart.
+
+## Verification
+
+What was actually exercised, rather than assumed:
+
+**Automated API checks** (throwaway scripts, run against the live Atlas database)
+- Products: search (case-insensitive, multi-word, regex-escaped), category filter, every sort mode,
+  pagination clamping, malformed id → 400, unknown id → 404, mass-assignment stripped
+- Orders: server pricing ignores a client-sent total, atomic stock decrement, **rollback verified** —
+  a two-line order where the second line has insufficient stock returns 409 and the first line's
+  decrement is undone, with no order persisted
+- Auth: bcrypt login, wrong password → 401, no hash leaked, protected routes 401 without/with a bad token
+- Analytics: 20/20 — including that the by-month series reconciles exactly with `totalRevenue` and
+  `totalOrders`, and that placing an order moves the totals and recalculates AOV
+- Recommendations: 13/13 — never the subject product, always the same category, never crosses
+  categories, error paths correct
+
+**Browser walkthrough** (headless Chrome, real clicks)
+- Full order placed from the storefront → order visible in MongoDB with the exact cart total
+- Cart persisted across a hard refresh; confirmation survived a refresh via sessionStorage
+- Checkout blocked on invalid input (focus moves to the first bad field) and surfaced the API's 409
+- Admin: protected route redirects when logged out, dashboard numbers match the API, product
+  create → edit → archive (confirmed as a soft delete in the database), order status change persisted,
+  status filter matched the API's counts exactly
+- Responsive: 7 routes at 375px and 768px — body width equals the viewport, no sideways scroll
+- Console clean across the whole session
 
 ## Seeded data
 
