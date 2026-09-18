@@ -52,6 +52,11 @@ apiClient.interceptors.request.use((config) => {
 apiClient.interceptors.response.use(
   (response) => response,
   (error) => {
+    // Aborted requests are a normal part of unmounting; let callers detect them.
+    if (axios.isCancel(error)) {
+      return Promise.reject(error);
+    }
+
     if (error.response?.status === 401) {
       clearSession();
       window.dispatchEvent(new CustomEvent(UNAUTHORIZED_EVENT));

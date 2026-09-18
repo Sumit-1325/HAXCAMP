@@ -1,20 +1,24 @@
+import { BrowserRouter, Route, Routes } from 'react-router-dom';
+
+import { StoreLayout } from './components/layout/StoreLayout.jsx';
 import { CartProvider } from './context/CartContext.jsx';
 import { ToastProvider } from './context/ToastContext.jsx';
+import Landing from './pages/store/Landing.jsx';
+import NotFound from './pages/store/NotFound.jsx';
 
 export default function App() {
   return (
-    <ToastProvider>
-      <CartProvider>
-        <main className="grid min-h-screen place-items-center px-6">
-          <div className="text-center">
-            <p className="text-xs font-medium uppercase tracking-[0.24em] text-ink-400">NEXORA</p>
-            <h1 className="mt-3 text-3xl font-semibold tracking-tight text-ink-950 sm:text-4xl">
-              Smart gear for modern workspaces
-            </h1>
-            <p className="mt-3 text-sm text-ink-500">Storefront is being built.</p>
-          </div>
-        </main>
-      </CartProvider>
-    </ToastProvider>
+    <BrowserRouter>
+      <ToastProvider>
+        <CartProvider>
+          <Routes>
+            <Route element={<StoreLayout />}>
+              <Route path="/" element={<Landing />} />
+              <Route path="*" element={<NotFound />} />
+            </Route>
+          </Routes>
+        </CartProvider>
+      </ToastProvider>
+    </BrowserRouter>
   );
 }
