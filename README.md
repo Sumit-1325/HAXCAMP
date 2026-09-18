@@ -19,8 +19,10 @@ Express + MongoDB backend.
 
 - **Day 1 (backend core):** complete — models, product/order/auth APIs, seed script, error handling.
 - **Day 2 (storefront):** complete — landing, listing (search / filter / sort / pagination), product
-  details, cart, checkout, confirmation. Vercel deploy pending.
-- **Day 3 (admin + analytics), Day 4 (polish):** pending.
+  details, cart, checkout, confirmation.
+- **Day 3 (admin + analytics):** complete — 85 seeded historical orders, aggregation endpoint, admin
+  login + protected routes, Recharts dashboard, product CRUD, order status workflow.
+- **Deploy (Vercel + Render) and Day 4 polish:** pending.
 
 ## Repository layout
 
@@ -30,22 +32,23 @@ HAXCAMP/
 │   ├── src/
 │   │   ├── config/        env.js (validated config), db.js (Mongoose connection)
 │   │   ├── constants/     CATEGORIES, ORDER_STATUSES, PAYMENT_METHODS, page sizes
-│   │   ├── controllers/   productController, orderController, authController
+│   │   ├── controllers/   productController, orderController, authController, analyticsController
 │   │   ├── middleware/    errorMiddleware (asyncHandler + single error shape), authMiddleware (JWT)
 │   │   ├── models/        Product, Order, Admin, Counter
-│   │   ├── routes/        productRoutes, orderRoutes, authRoutes
-│   │   ├── utils/         ApiError, query helpers, seed.js, seedData.js
+│   │   ├── routes/        productRoutes, orderRoutes, authRoutes, analyticsRoutes
+│   │   ├── utils/         ApiError, query + months helpers, seed.js, seedData.js, seedOrders.js
 │   │   └── server.js
 │   ├── .env.example       committed template — safe to read
 │   └── .env               real secrets — gitignored, never committed
 ├── frontend/
 │   ├── src/
 │   │   ├── api/           single Axios instance (VITE_API_URL, token, 401 interceptor) + resource modules
-│   │   ├── components/    ui/ primitives · layout/ shell · product/ · cart/ · order/ · common/
-│   │   ├── context/       CartContext (localStorage), ToastContext
-│   │   ├── hooks/         useApiResource, useProducts, useDebounce, useServerHealth, useAddToCart
+│   │   ├── components/    ui/ primitives · layout/ shells · product/ · cart/ · order/ · admin/ · auth/
+│   │   ├── context/       CartContext (localStorage), AuthContext (admin JWT), ToastContext
+│   │   ├── hooks/         useApiResource, useProducts, useAdminData, useDebounce, useServerHealth
 │   │   ├── lib/           constants, formatters, validation, cart/order storage, cn
-│   │   └── pages/store/   Landing, ProductListing, ProductDetails, Cart, Checkout, OrderConfirmation
+│   │   ├── pages/store/   Landing, ProductListing, ProductDetails, Cart, Checkout, OrderConfirmation
+│   │   └── pages/admin/   AdminRoutes (lazy), Login, Dashboard, Products, Orders
 │   ├── .env.example       VITE_API_URL template
 │   └── vercel.json        SPA rewrite + workspace-aware install command
 ├── .gitignore
@@ -112,7 +115,21 @@ npm run build:web           # production build → frontend/dist
 | `/cart` | Cart — persisted to localStorage |
 | `/checkout` | Validated checkout form → creates the order |
 | `/confirmation` | Order confirmation — order number kept in sessionStorage so a refresh still shows it |
-| `/admin/*` | Admin dashboard (Day 3) |
+
+### Admin routes
+
+Lazy-loaded at `/admin/*`, so the storefront bundle never downloads the dashboard or Recharts.
+
+| Route | Page |
+|---|---|
+| `/admin/login` | Sign in (surfaces the demo credentials with a fill button) |
+| `/admin/dashboard` | Revenue / orders / AOV / low-stock cards, revenue-by-month line, sales-by-category bars, top products |
+| `/admin/products` | Catalogue table with search + category filter, create / edit / archive |
+| `/admin/orders` | Every order with an inline status dropdown and a status filter |
+
+Protected routes redirect anonymous visitors to `/admin/login` and return them to where they were
+heading afterwards. A `401` from any request clears the session (axios interceptor) and bounces back to
+the login screen.
 
 ## API
 
@@ -130,6 +147,7 @@ All responses are `{ "success": true, "data": ... }` or `{ "success": false, "me
 | GET | `/api/orders` | Admin | List orders. Query: `status`, `page`, `limit` |
 | PUT | `/api/orders/:id/status` | Admin | `Pending → Processing → Shipped → Delivered` |
 | POST | `/api/auth/login` | — | Admin login → JWT (rate limited: 10 / 10 min) |
+| GET | `/api/admin/analytics` | Admin | Dashboard aggregation (see below) |
 
 `sort` accepts `newest`, `oldest`, `price-asc`, `price-desc`, `name-asc`, `name-desc`.
 List endpoints return `{ items, total, page, limit, totalPages }`.
@@ -159,15 +177,43 @@ already applied is rolled back and the API returns **409** — so a partial orde
 Each order item stores a **snapshot** (`name`, `price`, `category`, `image`) taken at purchase time, so
 later product edits never rewrite historical revenue.
 
+### Analytics response
+
+`GET /api/admin/analytics` is computed entirely with MongoDB aggregation pipelines — nothing is
+hardcoded, and every figure moves as soon as an order is placed.
+
+```json
+{
+  "totalRevenue": 1567772,
+  "totalOrders": 85,
+  "averageOrderValue": 18444.38,
+  "lowStockCount": 4,
+  "lowStockThreshold": 5,
+  "revenueByMonth": [{ "month": "2026-04", "label": "Apr 2026", "revenue": 427541, "orders": 19 }],
+  "salesByCategory": [{ "category": "Monitors", "revenue": 778975, "units": 25 }],
+  "topProducts": [{ "productId": "6512...", "name": "UltraWide 34\" Curved Monitor", "category": "Monitors", "revenue": 428989, "units": 11 }]
+}
+```
+
+Months are bucketed in UTC and labelled from a fixed table, and months with no orders are returned as
+zero so the chart stays continuous. The by-month series always reconciles with `totalRevenue` and
+`totalOrders` — the seeder generates its history inside the same window that the endpoint charts, so the
+two can't drift apart.
+
 ## Seeded data
 
-`npm run seed` wipes products, admins and orders, then inserts 13 demo products and the two admin
-accounts below. Product images use placeholder URLs (`picsum.photos`) — replace them with real product
-image URLs from the admin UI.
+`npm run seed` wipes products, admins and orders, then inserts:
 
-Historical demo orders (for the dashboard charts) are added on Day 3. **The dashboard is pre-populated
-with seeded demo orders** — they are real database documents aggregated by real queries, not hardcoded
-numbers.
+- **13 demo products** across 7 categories. Images use placeholder URLs (`picsum.photos`) — replace them
+  with real product image URLs from the admin UI.
+- **85 historical orders** spread across the last six months, with explicit `createdAt` timestamps and
+  the same item snapshots a live order would store. Status follows age: older orders have had time to
+  reach Delivered, only recent ones are still Pending.
+- **The two admin accounts** below.
+
+**The dashboard is pre-populated with seeded demo orders.** They are real database documents aggregated
+by real queries — not hardcoded numbers. Seeded history does not decrement product stock: it is a record
+of past sales, so current stock figures stay consistent with the seeded catalogue.
 
 ### Demo credentials
 
