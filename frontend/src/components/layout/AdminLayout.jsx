@@ -60,7 +60,10 @@ export function AdminLayout() {
       </header>
 
       <Container className="flex gap-8 py-8">
-        <nav aria-label="Admin sections" className="hidden w-52 shrink-0 lg:block">
+        <nav
+          aria-label="Admin sections"
+          className="hidden w-52 shrink-0 lg:sticky lg:top-24 lg:block lg:self-start"
+        >
           <ul className="space-y-1">
             {NAV_ITEMS.map(({ to, label, Icon }) => (
               <li key={to}>
