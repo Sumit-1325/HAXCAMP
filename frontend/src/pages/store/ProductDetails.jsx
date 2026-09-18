@@ -11,7 +11,10 @@ import { QuantityStepper } from '../../components/ui/QuantityStepper.jsx';
 import { Skeleton } from '../../components/ui/Skeleton.jsx';
 import { StockBadge } from '../../components/ui/StockBadge.jsx';
 import { ProductImage } from '../../components/product/ProductImage.jsx';
+import { ProductRecommendations } from '../../components/product/ProductRecommendations.jsx';
+import { RecentlyViewedRail } from '../../components/product/RecentlyViewedRail.jsx';
 import { formatPrice } from '../../lib/format.js';
+import { recordRecentlyViewed } from '../../lib/recentlyViewed.js';
 import { useAddToCart } from '../../hooks/useAddToCart.js';
 import { useCart } from '../../context/CartContext.jsx';
 import { useDocumentTitle } from '../../hooks/useDocumentTitle.js';
@@ -46,6 +49,11 @@ export default function ProductDetails() {
   useEffect(() => {
     setQuantity(1);
   }, [id]);
+
+  // Feeds the "Recently viewed" rail on the next product page.
+  useEffect(() => {
+    if (product) recordRecentlyViewed(product);
+  }, [product]);
 
   if (isLoading) {
     return (
@@ -175,6 +183,9 @@ export default function ProductDetails() {
           </div>
         </div>
       </div>
+
+      <ProductRecommendations productId={product._id} category={product.category} />
+      <RecentlyViewedRail excludeId={product._id} />
     </Container>
   );
 }

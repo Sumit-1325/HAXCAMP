@@ -10,6 +10,9 @@ export const fetchProducts = (params = {}, signal) => {
 export const fetchProduct = (id, signal) =>
   request({ url: `/api/products/${id}`, method: 'GET', signal });
 
+export const fetchRecommendations = (id, signal) =>
+  request({ url: `/api/products/${id}/recommendations`, method: 'GET', signal });
+
 export const createProduct = (payload) =>
   request({ url: '/api/products', method: 'POST', data: payload });
 
