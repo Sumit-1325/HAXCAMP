@@ -32,9 +32,15 @@ const toApiError = (error) => {
 
 const baseURL = (import.meta.env.VITE_API_URL || 'http://localhost:5000').replace(/\/$/, '');
 
+// The API runs on Render's free tier, which can take up to a minute to wake.
+// The ServerWakeNotice tells the user exactly that, so giving up at 20s would
+// contradict the message and surface an error they cannot act on. A refused
+// connection still fails instantly — only a genuine cold start waits.
+export const REQUEST_TIMEOUT_MS = 60000;
+
 export const apiClient = axios.create({
   baseURL,
-  timeout: 20000,
+  timeout: REQUEST_TIMEOUT_MS,
   headers: { 'Content-Type': 'application/json' },
 });
 
