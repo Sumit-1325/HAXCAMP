@@ -25,7 +25,3 @@ export const DEFAULT_SORT = 'newest';
 export const PRODUCT_PAGE_SIZE = 12;
 
 export const LOW_STOCK_THRESHOLD = 5;
-
-export const FREE_SHIPPING_THRESHOLD = 4999;
-
-export const SHIPPING_FEE = 99;
