@@ -4,14 +4,14 @@ import { fetchProduct, fetchProducts } from '../api/products.js';
 import { useApiResource } from './useApiResource.js';
 
 export const useProducts = (params = {}) => {
-  const { search = '', category = '', sort = '', page = 1 } = params;
+  const { search = '', category = '', sort = '', page = 1, limit } = params;
 
   const fetcher = useCallback(
-    (signal) => fetchProducts({ search, category, sort, page }, signal),
-    [search, category, sort, page],
+    (signal) => fetchProducts({ search, category, sort, page, limit }, signal),
+    [search, category, sort, page, limit],
   );
 
-  return useApiResource(fetcher, [search, category, sort, page]);
+  return useApiResource(fetcher, [search, category, sort, page, limit]);
 };
 
 export const useProduct = (id) => {
