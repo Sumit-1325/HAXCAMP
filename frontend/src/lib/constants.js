@@ -12,6 +12,13 @@ export const CATEGORIES = [
 
 export const ORDER_STATUSES = ['Pending', 'Processing', 'Shipped', 'Delivered'];
 
+export const ORDER_STATUS_TONES = {
+  Pending: 'warning',
+  Processing: 'accent',
+  Shipped: 'accent',
+  Delivered: 'success',
+};
+
 export const SORT_OPTIONS = [
   { value: 'newest', label: 'Newest' },
   { value: 'price-asc', label: 'Price: low to high' },
