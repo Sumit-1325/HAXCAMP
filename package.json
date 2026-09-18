@@ -1,0 +1,17 @@
+{
+  "name": "nexora",
+  "version": "1.0.0",
+  "private": true,
+  "description": "NEXORA - Smart gear for modern workspaces. E-commerce storefront + admin dashboard.",
+  "workspaces": [
+    "backend"
+  ],
+  "scripts": {
+    "dev": "npm run dev --workspace backend",
+    "start": "npm run start --workspace backend",
+    "seed": "npm run seed --workspace backend"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}
