@@ -1,5 +1,5 @@
 import { Search, X } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 import { Button } from '../ui/Button.jsx';
 import { Select } from '../ui/Input.jsx';
@@ -20,16 +20,26 @@ export function ProductFilters({
 }) {
   const [term, setTerm] = useState(search);
   const debouncedTerm = useDebounce(term, 350);
+  const lastPushed = useRef(search);
+  const onSearchChangeRef = useRef(onSearchChange);
+  onSearchChangeRef.current = onSearchChange;
 
-  // Keep the input in step with the URL (back/forward navigation).
+  // Keep the input in step with the URL: back/forward navigation and the
+  // "Clear filters" action both change `search` without the user typing.
   useEffect(() => {
     setTerm(search);
+    lastPushed.current = search;
   }, [search]);
 
+  // Push only values that originated from typing, and only when the debounce
+  // actually settles. Depending on the callback would re-run this on every
+  // render, which would let a still-debounced term immediately undo a filter
+  // the user just cleared.
   useEffect(() => {
-    if (debouncedTerm === search) return;
-    onSearchChange(debouncedTerm);
-  }, [debouncedTerm, search, onSearchChange]);
+    if (debouncedTerm === lastPushed.current) return;
+    lastPushed.current = debouncedTerm;
+    onSearchChangeRef.current(debouncedTerm);
+  }, [debouncedTerm]);
 
   const isFiltered = Boolean(search || category) || sort !== DEFAULT_SORT;
 
