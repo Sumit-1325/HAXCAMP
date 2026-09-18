@@ -53,7 +53,7 @@ export default function Landing() {
   return (
     <>
       <section className="border-b border-ink-200 bg-white">
-        <Container className="grid items-center gap-12 py-16 lg:grid-cols-2 lg:py-24">
+        <Container className="grid grid-cols-1 items-center gap-12 py-16 lg:grid-cols-2 lg:py-24">
           <div>
             <span className="inline-flex items-center gap-2 rounded-full border border-ink-200 px-3 py-1.5 text-xs font-medium tracking-wide text-ink-600">
               <Sparkles aria-hidden="true" className="h-3.5 w-3.5 text-accent-600" />
@@ -91,7 +91,7 @@ export default function Landing() {
       </section>
 
       <section className="border-b border-ink-200 bg-white">
-        <Container className="grid gap-8 py-12 sm:grid-cols-2 lg:grid-cols-4">
+        <Container className="grid grid-cols-1 gap-8 py-12 sm:grid-cols-2 lg:grid-cols-4">
           {VALUE_PROPS.map(({ Icon, title, body }) => (
             <div key={title}>
               <span className="grid h-10 w-10 place-items-center rounded-xl bg-ink-100 text-ink-700">
@@ -168,7 +168,7 @@ export default function Landing() {
       </section>
 
       <section id="story" className="scroll-mt-24 py-16">
-        <Container className="grid items-center gap-12 lg:grid-cols-2">
+        <Container className="grid grid-cols-1 items-center gap-12 lg:grid-cols-2">
           <div className="overflow-hidden rounded-card border border-ink-200 bg-ink-100">
             <img
               src="https://picsum.photos/seed/nexora-story/1200/900"

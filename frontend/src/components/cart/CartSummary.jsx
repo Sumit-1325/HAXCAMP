@@ -2,7 +2,7 @@ import { formatPrice, pluralize } from '../../lib/format.js';
 
 export function CartSummary({ itemCount, subtotal, children, footer }) {
   return (
-    <aside className="rounded-card border border-ink-200 bg-white p-5 lg:sticky lg:top-24">
+    <aside className="min-w-0 rounded-card border border-ink-200 bg-white p-5 lg:sticky lg:top-24">
       <h2 className="text-base font-semibold text-ink-900">Order summary</h2>
 
       <dl className="mt-5 space-y-3 text-sm">

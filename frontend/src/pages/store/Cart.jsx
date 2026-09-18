@@ -54,8 +54,8 @@ export default function Cart() {
         </Button>
       </div>
 
-      <div className="mt-8 grid gap-8 lg:grid-cols-[1fr_360px] lg:items-start">
-        <ul className="divide-y divide-ink-200 rounded-card border border-ink-200 bg-white px-5">
+      <div className="mt-8 grid grid-cols-1 gap-8 lg:grid-cols-[1fr_360px] lg:items-start">
+        <ul className="min-w-0 divide-y divide-ink-200 rounded-card border border-ink-200 bg-white px-5">
           {items.map((item) => (
             <CartLineItem
               key={item.productId}

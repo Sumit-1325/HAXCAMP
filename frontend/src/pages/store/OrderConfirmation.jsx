@@ -46,7 +46,7 @@ export default function OrderConfirmation() {
         </p>
       </div>
 
-      <div className="mt-8 grid gap-4 rounded-card border border-ink-200 bg-white p-5 sm:grid-cols-3">
+      <div className="mt-8 grid grid-cols-1 gap-4 rounded-card border border-ink-200 bg-white p-5 sm:grid-cols-3">
         <div>
           <p className="text-xs font-medium tracking-wider text-ink-400 uppercase">Order number</p>
           <p className="mt-1.5 text-lg font-semibold text-ink-950">{order.orderNumber}</p>
@@ -97,7 +97,7 @@ export default function OrderConfirmation() {
         </div>
       </section>
 
-      <div className="mt-8 grid gap-5 sm:grid-cols-2">
+      <div className="mt-8 grid grid-cols-1 gap-5 sm:grid-cols-2">
         <section className="rounded-card border border-ink-200 bg-white p-5">
           <h2 className="flex items-center gap-2 text-sm font-semibold text-ink-900">
             <MapPin aria-hidden="true" className="h-4 w-4 text-ink-400" />

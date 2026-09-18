@@ -14,13 +14,13 @@ import { useDocumentTitle } from '../../hooks/useDocumentTitle.js';
 function DashboardSkeleton() {
   return (
     <div className="space-y-6">
-      <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
         {Array.from({ length: 4 }, (_, index) => (
           <Skeleton key={index} className="h-28" />
         ))}
       </div>
       <Skeleton className="h-96" />
-      <div className="grid gap-6 xl:grid-cols-2">
+      <div className="grid grid-cols-1 gap-6 xl:grid-cols-2">
         <Skeleton className="h-96" />
         <Skeleton className="h-96" />
       </div>
@@ -62,7 +62,7 @@ export default function Dashboard() {
         description="Live numbers, computed from the orders in the database."
       />
 
-      <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
         <StatCard
           label="Total revenue"
           value={formatPrice(data.totalRevenue)}
@@ -100,7 +100,7 @@ export default function Dashboard() {
         <RevenueTrendChart data={data.revenueByMonth} />
       </Card>
 
-      <div className="mt-6 grid gap-6 xl:grid-cols-2">
+      <div className="mt-6 grid grid-cols-1 gap-6 xl:grid-cols-2">
         <Card title="Sales by category" description="Revenue per category, all time.">
           <CategorySalesChart data={data.salesByCategory} />
         </Card>

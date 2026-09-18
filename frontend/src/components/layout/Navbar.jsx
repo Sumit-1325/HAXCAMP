@@ -125,7 +125,7 @@ export function Navbar() {
               />
             </form>
 
-            <nav className="grid gap-1">
+            <nav className="grid grid-cols-1 gap-1">
               {NAV_LINKS.map((link) => (
                 <Link
                   key={link.label}

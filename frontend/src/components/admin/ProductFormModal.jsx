@@ -135,7 +135,7 @@ export function ProductFormModal({ isOpen, product, onClose, onSaved }) {
           placeholder="Aurora Wireless Headphones"
         />
 
-        <div className="grid gap-4 sm:grid-cols-3">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
           <Select
             id="product-category"
             label="Category"

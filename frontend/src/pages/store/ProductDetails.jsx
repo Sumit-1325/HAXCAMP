@@ -24,7 +24,7 @@ const NOT_FOUND_STATUSES = [400, 404];
 
 function DetailsSkeleton() {
   return (
-    <div className="grid gap-10 lg:grid-cols-2">
+    <div className="grid grid-cols-1 gap-10 lg:grid-cols-2">
       <Skeleton className="aspect-4/3 w-full rounded-card" />
       <div className="space-y-4">
         <Skeleton className="h-3 w-20" />
@@ -101,7 +101,7 @@ export default function ProductDetails() {
         ]}
       />
 
-      <div className="mt-7 grid gap-10 lg:grid-cols-2 lg:gap-14">
+      <div className="mt-7 grid grid-cols-1 gap-10 lg:grid-cols-2 lg:gap-14">
         <div className="overflow-hidden rounded-card border border-ink-200 bg-ink-100">
           <ProductImage product={product} loading="eager" className="aspect-4/3 w-full" />
         </div>

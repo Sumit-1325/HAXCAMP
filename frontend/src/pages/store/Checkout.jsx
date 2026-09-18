@@ -111,8 +111,13 @@ export default function Checkout() {
         No account needed — we only ask for what is required to deliver your order.
       </p>
 
-      <div className="mt-8 grid gap-8 lg:grid-cols-[1fr_360px] lg:items-start">
-        <form id="checkout-form" onSubmit={handleSubmit} noValidate className="space-y-8">
+      <div className="mt-8 grid grid-cols-1 gap-8 lg:grid-cols-[1fr_360px] lg:items-start">
+        <form
+          id="checkout-form"
+          onSubmit={handleSubmit}
+          noValidate
+          className="min-w-0 space-y-8"
+        >
           {submitError ? (
             <div role="alert" className="rounded-card border border-red-200 bg-red-50 p-4">
               <div className="flex gap-3">
@@ -137,7 +142,7 @@ export default function Checkout() {
           <fieldset className="rounded-card border border-ink-200 bg-white p-5">
             <legend className="px-1 text-base font-semibold text-ink-900">Contact details</legend>
 
-            <div className="mt-4 grid gap-4 sm:grid-cols-2">
+            <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2">
               <Input
                 id="name"
                 label="Full name"
@@ -178,7 +183,7 @@ export default function Checkout() {
           <fieldset className="rounded-card border border-ink-200 bg-white p-5">
             <legend className="px-1 text-base font-semibold text-ink-900">Shipping address</legend>
 
-            <div className="mt-4 grid gap-4 sm:grid-cols-2">
+            <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2">
               <Input
                 id="line1"
                 label="Address"
