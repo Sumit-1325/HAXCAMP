@@ -13,7 +13,7 @@ export const nextOrderNumber = async () => {
   const counter = await Counter.findByIdAndUpdate(
     ORDER_SEQUENCE,
     { $inc: { seq: 1 } },
-    { new: true, upsert: true, setDefaultsOnInsert: true },
+    { returnDocument: 'after', upsert: true, setDefaultsOnInsert: true },
   );
 
   return `NX-${10000 + counter.seq}`;

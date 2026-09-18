@@ -67,7 +67,7 @@ export const updateProduct = asyncHandler(async (req, res) => {
   }
 
   const product = await Product.findByIdAndUpdate(req.params.id, payload, {
-    new: true,
+    returnDocument: 'after',
     runValidators: true,
   });
 
@@ -81,7 +81,7 @@ export const deleteProduct = asyncHandler(async (req, res) => {
   const product = await Product.findByIdAndUpdate(
     req.params.id,
     { isActive: false },
-    { new: true },
+    { returnDocument: 'after' },
   );
 
   if (!product) {

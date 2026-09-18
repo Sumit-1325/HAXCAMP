@@ -79,7 +79,7 @@ export const createOrder = asyncHandler(async (req, res) => {
       const updated = await Product.findOneAndUpdate(
         { _id: item.productId, isActive: true, stock: { $gte: item.qty } },
         { $inc: { stock: -item.qty } },
-        { new: true },
+        { returnDocument: 'after' },
       );
 
       if (!updated) {
@@ -132,7 +132,7 @@ export const updateOrderStatus = asyncHandler(async (req, res) => {
     throw ApiError.badRequest(`Status must be one of: ${ORDER_STATUSES.join(', ')}`);
   }
 
-  const order = await Order.findByIdAndUpdate(req.params.id, { status }, { new: true });
+  const order = await Order.findByIdAndUpdate(req.params.id, { status }, { returnDocument: 'after' });
 
   if (!order) {
     throw ApiError.notFound('Order not found');
