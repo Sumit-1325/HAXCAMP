@@ -5,6 +5,7 @@ import helmet from 'helmet';
 import { connectDB } from './config/db.js';
 import { env } from './config/env.js';
 import { errorHandler, notFound } from './middleware/errorMiddleware.js';
+import analyticsRoutes from './routes/analyticsRoutes.js';
 import authRoutes from './routes/authRoutes.js';
 import orderRoutes from './routes/orderRoutes.js';
 import productRoutes from './routes/productRoutes.js';
@@ -44,6 +45,7 @@ app.get('/api/health', (req, res) => {
 app.use('/api/products', productRoutes);
 app.use('/api/orders', orderRoutes);
 app.use('/api/auth', authRoutes);
+app.use('/api/admin', analyticsRoutes);
 
 app.use(notFound);
 app.use(errorHandler);
