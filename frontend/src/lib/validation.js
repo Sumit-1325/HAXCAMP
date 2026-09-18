@@ -36,3 +36,30 @@ export const validateCheckout = (values) => {
 
   return errors;
 };
+
+export const validateProduct = (values) => {
+  const errors = {};
+
+  if (!values.name.trim()) errors.name = 'Product name is required';
+  else if (values.name.trim().length < 3) errors.name = 'Name must be at least 3 characters';
+
+  if (!values.category) errors.category = 'Choose a category';
+
+  if (String(values.price).trim() === '') errors.price = 'Price is required';
+  else if (!isNonNegativeNumber(values.price)) errors.price = 'Price must be a number of 0 or more';
+
+  if (String(values.stock).trim() === '') errors.stock = 'Stock is required';
+  else if (!Number.isInteger(Number(values.stock)) || Number(values.stock) < 0) {
+    errors.stock = 'Stock must be a whole number of 0 or more';
+  }
+
+  if (values.image.trim() && !isHttpUrl(values.image)) {
+    errors.image = 'Enter a full image URL starting with http:// or https://';
+  }
+
+  if (values.description.length > 2000) {
+    errors.description = 'Description cannot exceed 2000 characters';
+  }
+
+  return errors;
+};
