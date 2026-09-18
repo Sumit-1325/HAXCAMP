@@ -18,7 +18,9 @@ Express + MongoDB backend.
 ## Status
 
 - **Day 1 (backend core):** complete — models, product/order/auth APIs, seed script, error handling.
-- **Day 2 (storefront), Day 3 (admin + analytics), Day 4 (polish):** pending.
+- **Day 2 (storefront):** complete — landing, listing (search / filter / sort / pagination), product
+  details, cart, checkout, confirmation. Vercel deploy pending.
+- **Day 3 (admin + analytics), Day 4 (polish):** pending.
 
 ## Repository layout
 
@@ -36,11 +38,27 @@ HAXCAMP/
 │   │   └── server.js
 │   ├── .env.example       committed template — safe to read
 │   └── .env               real secrets — gitignored, never committed
-├── frontend/              Day 2
+├── frontend/
+│   ├── src/
+│   │   ├── api/           single Axios instance (VITE_API_URL, token, 401 interceptor) + resource modules
+│   │   ├── components/    ui/ primitives · layout/ shell · product/ · cart/ · order/ · common/
+│   │   ├── context/       CartContext (localStorage), ToastContext
+│   │   ├── hooks/         useApiResource, useProducts, useDebounce, useServerHealth, useAddToCart
+│   │   ├── lib/           constants, formatters, validation, cart/order storage, cn
+│   │   └── pages/store/   Landing, ProductListing, ProductDetails, Cart, Checkout, OrderConfirmation
+│   ├── .env.example       VITE_API_URL template
+│   └── vercel.json        SPA rewrite + workspace-aware install command
 ├── .gitignore
+├── .npmrc                 forces devDependencies to install (see note below)
 ├── package.json           npm workspaces root
+├── render.yaml            backend blueprint for Render
 └── plan-final.md
 ```
+
+> **Why `.npmrc`?** npm omits `devDependencies` when `NODE_ENV=production` is set in the ambient
+> environment. Vite and Tailwind are devDependencies and are required to *build* the frontend, so
+> installs would silently skip them and fail with `vite: not recognized`. `include=dev` pins the
+> behaviour everywhere, including host builds.
 
 ## Running the backend
 
@@ -73,6 +91,28 @@ Everything sensitive lives in `backend/.env` (gitignored). `.env.example` is the
 | `DEMO_ADMIN_NAME` / `DEMO_ADMIN_EMAIL` / `DEMO_ADMIN_PASSWORD` | no | see `.env.example` | Demo admin published in this README |
 
 The server exits immediately on boot if `MONGODB_URI` or `JWT_SECRET` is missing.
+
+## Running the frontend
+
+```bash
+npm install                 # from the repo root
+npm run dev:web             # http://localhost:5173
+npm run build:web           # production build → frontend/dist
+```
+
+`VITE_API_URL` in `frontend/.env` points at the API (default `http://localhost:5000`).
+
+### Storefront routes
+
+| Route | Page |
+|---|---|
+| `/` | Landing — hero, value props, four newest products, categories, brand story |
+| `/products` | Listing — `?search=&category=&sort=&page=` (URL is the source of truth, so links are shareable) |
+| `/products/:id` | Product details |
+| `/cart` | Cart — persisted to localStorage |
+| `/checkout` | Validated checkout form → creates the order |
+| `/confirmation` | Order confirmation — order number kept in sessionStorage so a refresh still shows it |
+| `/admin/*` | Admin dashboard (Day 3) |
 
 ## API
 
@@ -135,6 +175,23 @@ numbers.
 |---|---|---|
 | Demo admin | `demo@nexora.dev` | `Demo@12345` |
 | Private admin | value of `ADMIN_EMAIL` in `.env` | value of `ADMIN_PASSWORD` in `.env` |
+
+## Deploying the frontend (Vercel)
+
+Import the repo in Vercel and set:
+
+- **Root Directory:** `frontend`
+- **Install Command:** `cd .. && npm install` (already set in `frontend/vercel.json`) — the dependency
+  tree lives at the repo root because this is an npm workspace
+- **Build Command:** `npm run build`
+- **Output Directory:** `dist`
+- **Environment variable:** `VITE_API_URL` = your Render URL, e.g. `https://nexora-api.onrender.com`
+
+`frontend/vercel.json` also contains the SPA rewrite, so refreshing `/products/:id` or `/confirmation`
+serves `index.html` instead of a 404.
+
+Then add the Vercel URL to the backend's `CORS_ORIGINS` in Render (comma-separated) — the API rejects
+unknown origins by design.
 
 ## Deploying the backend (Render)
 
