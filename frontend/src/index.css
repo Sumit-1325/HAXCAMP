@@ -1,0 +1,65 @@
+@import 'tailwindcss';
+
+@theme {
+  --font-sans: 'Inter', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
+
+  --color-canvas: #f7f7f8;
+  --color-surface: #ffffff;
+
+  --color-ink-50: #f7f7f8;
+  --color-ink-100: #ececed;
+  --color-ink-200: #d9d9dd;
+  --color-ink-300: #b8b8bf;
+  --color-ink-400: #8e8e99;
+  --color-ink-500: #6d6d78;
+  --color-ink-600: #55555f;
+  --color-ink-700: #404048;
+  --color-ink-800: #26262c;
+  --color-ink-900: #141418;
+  --color-ink-950: #0b0b0f;
+
+  --color-accent-50: #f1f1fe;
+  --color-accent-100: #e5e5fc;
+  --color-accent-200: #cfcff9;
+  --color-accent-300: #b0b0f4;
+  --color-accent-400: #8f8fec;
+  --color-accent-500: #6f6fe0;
+  --color-accent-600: #5b5bd6;
+  --color-accent-700: #4a4ab8;
+  --color-accent-800: #3d3d96;
+  --color-accent-900: #34347a;
+
+  --radius-card: 1rem;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  background-color: var(--color-canvas);
+  color: var(--color-ink-900);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+:focus-visible {
+  outline: 2px solid var(--color-accent-600);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
